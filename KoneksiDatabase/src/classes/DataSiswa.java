@@ -3,38 +3,41 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package DatabaseConnection;
-import java.sql.*;
-import javax.swing.table.DefaultTableModel;
+package classes;
+
 /**
  *
- * @author Firdaus Haqiqi
+ * @author _AipH_
  */
+import java.sql.*;
+import javax.swing.table.DefaultTableModel;
 
 public class DataSiswa extends javax.swing.JFrame {
-    
+
     /**
      * Creates new form DataSiswa
      */
-    Connection koneksi;
     
+    Connection koneksi;
+            
     public DataSiswa() {
         initComponents();
-         koneksi = (DataSiswa.Connection) DatabaseConnection.getKoneksi("localhost", "3306", "root", "", "db_sekolah");
+        koneksi = DatabaseConnection.getKoneksi("localhost", "3306", "root", "", "db_sekolah");
         showData();
     }
 
     DefaultTableModel dtm;
+    
     public void showData(){
+        String[] kolom = {"No", "NIS", "Nama", "Kelas", "Jurusan"};
         
-        String[] kolom = {"NO", "NIS", "Nama", "Kelas", "Jurusan"};
+        dtm = new DefaultTableModel(null, kolom);
         
-        dtm = new DefaultTableModel (null, kolom);
-        
-        try {
+        try{
             Statement stmt = koneksi.createStatement();
-            String query = "SELECT * FROM `t_siswa`";
+            String query = "SELECT * FROM t_siswa";
             ResultSet rs = stmt.executeQuery(query);
+            
             int no = 1;
             while (rs.next()){
                 String nis = rs.getString("nis");
@@ -42,12 +45,13 @@ public class DataSiswa extends javax.swing.JFrame {
                 String kelas = rs.getString("kelas");
                 String jurusan = rs.getString("jurusan");
                 
-                dtm.addRow(new String [] {no+"", nis,nama,kelas,jurusan});
+                dtm.addRow(new String[]{no+"", nis, nama, kelas, jurusan});
                 no++;
             }
-        }catch (SQLException ex) {
+        } catch (SQLException ex){
             ex.printStackTrace();
         }
+        
         tbl_siswa.setModel(dtm);
     }
     /**
@@ -60,131 +64,98 @@ public class DataSiswa extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
         tbl_siswa = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
+        cmdRefresh = new javax.swing.JButton();
         cmdHapus = new javax.swing.JButton();
         cmdEdit = new javax.swing.JButton();
         cmdTambah = new javax.swing.JButton();
-        cmdRefresh = new javax.swing.JButton();
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         tbl_siswa.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "No", "NIS", "Nama", "Kelas", "Jurusan"
             }
-        ));
-        tbl_siswa.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tbl_siswaMouseClicked(evt);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
-        jScrollPane3.setViewportView(tbl_siswa);
+        tbl_siswa.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(tbl_siswa);
+        if (tbl_siswa.getColumnModel().getColumnCount() > 0) {
+            tbl_siswa.getColumnModel().getColumn(0).setResizable(false);
+            tbl_siswa.getColumnModel().getColumn(0).setPreferredWidth(5);
+            tbl_siswa.getColumnModel().getColumn(1).setResizable(false);
+            tbl_siswa.getColumnModel().getColumn(1).setPreferredWidth(75);
+            tbl_siswa.getColumnModel().getColumn(2).setResizable(false);
+            tbl_siswa.getColumnModel().getColumn(3).setResizable(false);
+            tbl_siswa.getColumnModel().getColumn(4).setResizable(false);
+        }
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setText("DATA SISWA");
+        cmdRefresh.setText("Refresh");
 
         cmdHapus.setText("Hapus");
-        cmdHapus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdHapusActionPerformed(evt);
-            }
-        });
 
         cmdEdit.setText("Ubah");
 
         cmdTambah.setText("Tambah");
-        cmdTambah.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdTambahActionPerformed(evt);
-            }
-        });
 
-        cmdRefresh.setText("Refresh");
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Data Siswa");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLabel1.setOpaque(true);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(178, 178, 178)
-                                .addComponent(jLabel1)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(cmdRefresh)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(cmdTambah)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmdEdit)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmdHapus)))
+                        .addComponent(cmdHapus))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addGap(10, 10, 10)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 46, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmdRefresh)
-                    .addComponent(cmdTambah)
+                    .addComponent(cmdHapus)
                     .addComponent(cmdEdit)
-                    .addComponent(cmdHapus))
+                    .addComponent(cmdTambah))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void cmdTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTambahActionPerformed
-        // TODO add your handling code here:
-        ManageData tambahData = new ManageData (this, true);
-        tambahData.setVisible(true);
-    }//GEN-LAST:event_cmdTambahActionPerformed
-    
-    int baris;
-    private void tbl_siswaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_siswaMouseClicked
-        // TODO add your handling code here:
-        baris = tbl_siswa.getSelectedRow();
-    }//GEN-LAST:event_tbl_siswaMouseClicked
-
-    private void cmdHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdHapusActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cmdHapusActionPerformed
 
     /**
      * @param args the command line arguments
@@ -228,18 +199,6 @@ public class DataSiswa extends javax.swing.JFrame {
     private javax.swing.JButton cmdTambah;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTable tbl_siswa;
     // End of variables declaration//GEN-END:variables
-
-    private static class Connection {
-
-        public Connection() {
-        }
-
-        private Statement createStatement() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-    }
 }
